@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+</head>
+<script type="text/javascript">
+function Back()
+{		
+	var frm = document.getElementById('frmMain');
+	frm.action='/managerReview';
+	frm.submit();		
+}	
+</script>
+<body>
+	<form id='frmMain' name='frmMain'>
+	<div id="admain">	  		
+    	<h2 align="center">Travel Expense Details</h2>
+    	<div>
+    	<table width="100%" border="0" cellpadding="4" cellspacing="1" class="tblBorder">
+    		<tr>
+		        <td width="20%"   class="tblLabel"><%= "Employee Name" %></td>
+		        <td width="36%" class="tblContent"><%= @employee.name%></td>
+		
+		        <td width="20%" class="tblLabel"><%= "Project" %></td>
+		        <td width="30%" class="tblContent"><%= @employee.project.name %></td>
+	      	</tr>
+	      	<tr>
+		        <td width="20%" class="tblLabel"><%= "Emp. ID" %></td>
+		        <td width="36%" class="tblContent" ><%= @employee.empid %></td>
+		        
+		        <td width="20%" class="tblLabel"><%= "Department" %></td>
+		        <td width="30%" class="tblContent" ><%= @employee.department.name %></td>
+	      	</tr>
+	      	<tr>
+	        	<td width="20%" class="tblLabel"><%= "Travel Period From" %></td>
+        		<td width="36%" class="tblContent"><%= @billexpenses.travelFromDate %></td>
+			
+				<td width="20%" class="tblLabel"><%= "Travel Period  To" %></td>
+			   	<td width="30%" class="tblContent"><%= @billexpenses.travelToDate %></td>
+	      	</tr> 
+			<tr>
+				<td width="20%" class="tblLabel"><%= "Attach Receipts" %></td> 
+				<td width="36%" class="tblContent"><%= link_to "view Receipts",{:controller => "EmployeeTravelExpenses", :action => "viewpicture", :id => @billexpenses.id}%></td>
+				
+				<td width="20%" class="tblLabel"><%= "Client Billable" %></td>
+				<td class="tblContent">
+					<%if @billexpenses.clientBillable == false %>
+           				Yes
+	   				<% else %>
+	   					No
+	   				<% end %>
+	   			</td>
+			</tr>
+		</table>
+		</div>
+    	<br/>
+    	<div class="portletSkin" style="height:500px;">
+    		<div class="portletHeader"><%= "Bill / Expense Details" %> </div>
+    		<div style="padding:10px;">
+    		<div style="height:380px;overflow:hidden;overflow-y:auto">
+    			<table id="dataTable" width="100%" border="0" align="center" cellpadding="4" cellspacing="1" class="tblBorder">
+       			<thead>
+       			<tr>
+       				<td width="5%"><%= "Date" %></td>
+		            <td width="40%"><%= "Expense Details" %></td>
+		            <td width="7%"><%= "Travel Air/Other" %></td>
+		            <td width="7%"><%= "Local Conveyance" %></td>
+		            <td width="7%"><%= "Per Diem" %></td>
+				    <td width="7%"><%= "Lodging (Room & taxes only)" %></td>
+				    <td width="7%"><%= "Meals" %></td>
+				    <td width="7%"><%= "Client Entertainment" %></td>
+				    <td width="7%"><%= "Telephone" %></td>
+				    <td width="7%"><%= "Miscellaneous Expenses" %></td>
+				    <td width="7%"><%= "Total Expenses" %></td>
+				    <td width="7%"><%= "Less Paid by Company" %></td>
+				    <td width="15%"><%= "Total Claimed by Company" %></td>
+        		</tr>
+        		</thead>
+       			</table>
+			</div>
+			<div id="totalRow"><%= "Total (INR):"%><%= @billexpenses.grandTotal %></div>
+			</div>
+			<div style="float:right">
+	  			<div class="buttonBlueLeft" style="margin-left:5px;">
+			      <div class="buttonText" onclick="Back()" >Back</div>
+			      <div class="buttonBlueRight_M"></div>
+			    </div>
+  			</div>
+  		</div>
+  		
+  	</div>
+  	</form>>
+  </body> 
+</html> 
+
+		          		

@@ -1,0 +1,525 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript">
+$(document).ready(function () {
+	 
+	$('#billexpense_travelFromDate, #billexpense_travelToDate').datepicker({
+        showOn: "button",
+        beforeShow: customRange,
+        dateFormat: "dd M yy",
+        firstDay: 1, 
+        changeFirstDay: false,
+        buttonImage: "../../images/date-picker.png",
+        buttonImageOnly: true
+    });
+
+
+		$('#attachReceipts').click(function() {
+		$("#actionPanelsUpload").dialog({
+			modal : true,
+			width : 600
+		});
+	})
+
+});
+var length;
+function customRange(input) { 
+    var min = new Date(2008, 11 - 1, 1), //Set this to your absolute minimum date
+        dateMin = min,
+        dateMax = null,
+        dayRange = 16; // Set this to the range of days you want to restrict to
+
+    if (input.id === "billexpense_travelFromDate") {
+        if ($("#billexpense_travelToDate").datepicker("getDate") != null) {
+            dateMax = $("#billexpense_travelToDate").datepicker("getDate");
+            dateMin = $("#billexpense_travelToDate").datepicker("getDate");
+            dateMin.setDate(dateMin.getDate() - dayRange);
+            if (dateMin < min) {
+                dateMin = min;
+            }
+        }
+        else {
+            dateMax = new Date; //Set this to your absolute maximum date
+        }                      
+    }
+    else if (input.id === "billexpense_travelToDate" ) {
+        dateMax = new Date; //Set this to your absolute maximum date
+        if ($("#billexpense_travelFromDate").datepicker("getDate") != null) {
+            dateMin = $("#billexpense_travelFromDate").datepicker("getDate");
+            var rangeMax = new Date(dateMin.getFullYear(), dateMin.getMonth(),dateMin.getDate() + new Date);
+
+            if(rangeMax < dateMax) {
+                dateMax = rangeMax; 
+            }
+        }
+    }
+    for(var i=1;i<=length;i++)
+    {
+    	if (input.id === "billExpenses_billDate"+(i)) {
+        dateMax = new Date; //Set this to your absolute maximum date
+        if ($("#billexpense_travelFromDate").datepicker("getDate") != null) {
+            dateMin = $("#billexpense_travelFromDate").datepicker("getDate");
+                                                var rangeMax = $("#billexpense_travelToDate").datepicker("getDate");
+
+            if(rangeMax < dateMax) {
+                dateMax = rangeMax; 
+            }
+        }
+    	}
+    }
+
+    return {
+        minDate: dateMin, 
+        maxDate: dateMax
+    };     
+}
+
+
+function addRow()
+{
+	var table = document.getElementById('dataTable');
+  	var lastRow = table.rows.length;
+  	//alert(lastRow);
+  	// if there's no header row in the table, then iteration = lastRow + 1
+  	var iteration = lastRow;
+  	length=iteration;
+  	var row = table.insertRow(lastRow);
+  	//alert(iteration);
+  	//Cell 1
+  	var cell1 = row.insertCell(0);
+  	var textNode = document.createTextNode(iteration);
+  	cell1.appendChild(textNode);
+  	/*var element1 = document.createElement('input');
+  	element1.type = 'checkbox';
+  	element1.name = 'checkbox_name' + iteration;
+	element1.id = 'checkbox_name' + iteration;
+  	cell1.appendChild(element1);*/
+  	
+  	//cell 2
+  	var cell2 = row.insertCell(1);
+  	var element2 = document.createElement('input');
+  	element2.type = 'text';
+  	element2.name ='billExpenses_billNo' + iteration;
+  	element2.id = 'billExpenses_billNo' + iteration; 
+  	element2.size=15;
+  	cell2.appendChild(element2);
+  	
+  	//cell 3
+  	var cell3 = row.insertCell(2);
+  	var element3 = document.createElement('input');
+  	element3.type = 'text';
+  	element3.name = 'billExpenses_billDate'+iteration;
+  	element3.id = 'billExpenses_billDate'+iteration;
+  	element3.size=12;
+  	cell3.appendChild(element3);
+  	
+  	$("#billExpenses_billDate"+iteration).datepicker({
+		showOn: "button",
+        beforeShow: customRange,
+        dateFormat: "dd M yy",
+        firstDay: 1, 
+        changeFirstDay: false,
+        buttonImage: "../images/date-picker.png",
+        buttonImageOnly: true
+	});
+  	//cell 4
+  	var cell4 = row.insertCell(3);
+ 	var select = document.createElement('select');
+  	select.name = 'select' + iteration;
+  	select.id = 'select' + iteration
+ 	select.options[0] = new Option('Select', '');
+  	select.options[1] = new Option('Local Conveyance', '1');
+  	select.options[2] = new Option('Travel Air/Other', '2');
+  	select.options[3] = new Option('Per Diem', '3');
+  	select.options[4] = new Option('Lodging(Room and Taxes only)', '4');
+  	select.options[5] = new Option('Meals', '5');
+  	select.options[6] = new Option('Client Entertainment', '6');
+  	select.options[7] = new Option('Telephone', '7');
+  	select.options[8] = new Option('Other', '8');
+ 	cell4.appendChild(select);
+ 	
+ 	//cell 5
+ 	var cell4 = row.insertCell(4);
+  	var element4 = document.createElement('input');
+  	element4.type = 'text';
+  	element4.name = 'billExpenses_amount' + iteration;
+  	element4.id = 'billExpenses_amount' + iteration;
+  	element4.value=0;
+  	element4.setAttribute('onChange', 'callme(this);' ); 
+  	element4.size=20;
+  	cell4.appendChild(element4);
+  	
+}
+function callme(value1){
+	if(!IsNumeric(document.getElementById(value1.id).value))
+	{
+		alert("Please enter numeric value");
+		document.getElementById(value1.name).value=0;
+	 	document.getElementById(value1.name).focus=true;
+		return;
+	}
+	doCalculation();
+}
+function doCalculation()
+{
+	//alert(value);
+	var table = document.getElementById('dataTable');
+  	var intLine = parseInt(table.rows.length);
+	
+	var grandtotal=0;
+	for(var i=1;i<intLine;i++){
+		var total=0;
+		var currentValue=parseFloat(document.getElementById("billExpenses_amount"+(i)).value);
+		total=total+currentValue;
+		grandtotal=grandtotal+total;
+	}
+	
+	//alert("grandtotal="+grandtotal);
+	global=grandtotal;
+	document.getElementById("billexpense_grandTotal").readOnly=false;
+	document.getElementById("billexpense_grandTotal").value=grandtotal;
+	document.getElementById("billexpense_grandTotal").readOnly=true;
+	
+}
+function IsNumeric(strString)
+{
+	var strValidChars = "0123456789.";
+   	var strChar;
+   	var blnResult = true;
+	if (strString.length == 0) return false;
+	//  test strString consists of valid characters listed above
+	for (i = 0; i < strString.length && blnResult == true; i++)
+	{
+		strChar = strString.charAt(i);
+	    if (strValidChars.indexOf(strChar) == -1)
+	    {
+	    	blnResult = false;
+	    }
+	}
+	return blnResult;
+}
+
+function addRow1()
+{
+	
+	var theTable = document.getElementById('dataTable');
+	var lastrow=theTable.rows.length; 
+    var iteration=lastrow;
+    //alert(iteration);
+    var newRow = theTable.insertRow(lastrow);
+    newRow.id = newRow.uniqueID;
+    var newCell;
+               
+	//var newRow = theTable.insertRow(-1);
+	
+	//cell 0
+ 	var newCell0 = newRow.insertCell(0);
+ 	var textNode = document.createTextNode(iteration);
+  	newCell0.appendChild(textNode);
+  	//newCell0.innerHTML = '<%= check_box :checkbox,:name %>';
+  	
+  	var newCell1 = newRow.insertCell(1);
+  	newCell1.innerHTML = '<%= text_field :billExpenses,:billNo, :size=>20,:index =>1 , :class => 'inputField'%>';
+  
+   	//cell 2
+   	var newCell2 = newRow.insertCell(2);
+  	newCell2.innerHTML = '<%= text_field :billExpenses, :billDate, :size=>15, :class => 'inputField' %>';
+
+		var newCell3 = newRow.insertCell(3);
+		/*var str =
+ <%= collection_select :expensetypes, :id, Expensetype.all, :id, :name, :prompt => "Select" %>
+	*/
+
+	}
+
+	function removeRow() {
+		var table = document.getElementById('dataTable');
+		var lastRow = table.rows.length;
+		//alert(lastRow);
+		table.deleteRow(lastRow - 1);
+		doCalculation();
+	}
+
+	function submitForm() {
+
+		if(!validateform() || !Validateinputfile())
+			return false;
+		var frm = document.getElementById('frmMain');
+		alert("Aa");
+		return false;
+		/*
+		for (i=3;i<14;i++)
+		{
+		document.getElementById("Column"+i+"_total").disabled=false;
+		}
+		document.getElementById("grandtotal").disabled=false;*/
+
+		//var frm = document.getElementsByTagName('form');
+		//alert($('#maxLine_hdnMaxLine').val())
+		document.getElementById('maxLine_hiddenarray').value = length;
+		document.getElementById("billexpense_grandTotal").disabled = false;
+		// for(i=1;i<length;i++)
+		// {
+			// var billno=document.getElementById("billExpenses_billNo"+(i)).value;
+			// var billdate=document.getElementById("billExpenses_billDate"+(i)).value;
+			// //var type=document.getElementById("select"+(i)).value;
+			// //alert(document.getElementById("select"+(i)).value);
+			// var amount=document.getElementById("billExpenses_amount"+(i)).value;
+			// if(billno==null && billdate==null && amount==null)
+			// {
+				// alert("please Enter records in orderwise");
+				// return false;
+			// }
+		// }
+		//return true;
+		frm.submit();
+	}
+
+	function validateform() {
+		//alert(length);
+		var myDate = new Date();
+		var todaydate = new Date(myDate.getFullYear(), myDate.getMonth(), myDate.getDate());
+		var fromdate = document.getElementById("billexpense_travelFromDate").value;
+		if(fromdate.length == 0) {
+			alert("Please select Travel Period From");
+			return false;
+		}
+		var todate = document.getElementById("billexpense_travelToDate").value;
+		if(todate.length == 0) {
+			alert("Please select Travel Period To");
+			return false;
+		}
+		var fd = new Date(fromdate.substr(6, 4), parseInt(fromdate.substr(0, 2)) - 1, fromdate.substr(3, 2));
+		var td = new Date(todate.substr(6, 4), parseInt(todate.substr(0, 2)) - 1, todate.substr(3, 2));
+		
+		for(var i=1;i<=length;i++)
+		{
+			if((document.getElementById("billExpenses_billNo"+(i))=="")||(document.getElementById("billExpenses_billDate"+(i))=="")||(document.getElementById("select"+(i))=="")||(document.getElementById("billExpenses_amount"+(i))==""))
+			//if(document.getElementById("billExpenses_billNo"+(i))=="")
+			{
+				alert("Please Enter mandatory fields(s)");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	var _validFileExtensions = [".rar", ".zip"];
+	function Validateinputfile() {
+		var arrInputs = document.getElementById("billexpense_filename");
+		var sFileName = arrInputs.value;
+		if(sFileName.length == 0) {
+			alert("Please select the receipts file in *.zip or *.rar format");
+			return false;
+		}
+		if(sFileName.length > 0) {
+			var blnValid = false;
+			for(var j = 0; j < _validFileExtensions.length; j++) {
+				var sCurExtension = _validFileExtensions[j];
+				if(sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+					blnValid = true;
+					break;
+				}
+			}
+			if(!blnValid) {
+				//alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+				alert(" allowed file extension are " + _validFileExtensions.join(", "));
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function Demo() {
+		for(var i = 1; i < 2; i++) {
+			addRow();
+		}
+	}
+function generateReport()
+{
+	//window.open("/failure.html",'win1','width=700,height=700,menubar=false,status=false')
+	window.open ('generateReport', 'newwindow', config='height=400,width=900, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=no')
+
+}
+
+function Back()
+{
+	var frm = document.getElementById('frmMain');
+	frm.action='/managerReview';
+	frm.submit();	
+}
+</script>
+</head>
+<% if @viewflag==false %>
+	<body onload="Demo()">
+<% else %>
+	</body>
+<% end %>
+<% unless flash[:notice].blank? %>
+<script type="text/javascript">alert('<%= flash[:notice] %>');</script>
+<% end %>
+<form name="frmMain" id="frmMain" action="/create" method="post" enctype="multipart/form-data"> 
+  <!-- <%= form_for @employee, :id =>"frmMain" ,:url => {:action => "create"},:method =>'POST' do |f|%>  -->
+	<div id="admain">
+		 <h2 align="center">Travel Expenses Form</h2>
+		 <div>
+		 	<table width="100%" border="0" cellpadding="4" cellspacing="1" class="tblBorder">
+		 		 <tr>
+			        <td width="20%"   class="tblLabel"><%= "Employee Name" %></td>
+			        <td width="36%" class="tblContent"><%= @employee.name%></td>
+			
+			        <td width="20%" class="tblLabel"><%= "Project" %></td>
+			        <td width="30%" class="tblContent"><%= @employee.project.name %></td>
+	      		</tr>
+	      		<tr>
+			        <td width="20%" class="tblLabel"><%= "Emp. ID" %></td>
+			        <td width="36%" class="tblContent" ><%= @employee.empid %></td>
+			        <td width="20%" class="tblLabel"><%= "Department" %></td>
+			        <td width="30%" class="tblContent" ><%= @employee.department.name %></td>
+	      		</tr>	
+	      		<tr>
+			        <td width="20%" class="tblLabel"><%= "Travel Period From " %><abbr class='mandatory'>*</abbr></td>
+			        <td width="36%" class="tblContent">
+			        <% if @viewflag==false %>
+						<%= text_field :billexpense,:travelFromDate,:required => true, :size=>12, :class => 'inputField' %>
+					<% else %>
+						<%= @billexpenses.travelFromDate %>
+					<% end %>
+					</td>
+						
+					<td width="20%" class="tblLabel"><%= "Travel Period  To "%><abbr class='mandatory'>*</abbr></td>
+			       	<td width="30%" class="tblContent">
+			       	<% if @viewflag==false %>
+						<%= text_field :billexpense,:travelToDate,:size=>12, :class => 'inputField' %>
+					<% else %>
+						<%= @billexpenses.travelToDate %>
+					<% end %>
+					</td>
+				</tr>
+	      		<tr>
+		        	<td width="20%" class="tblLabel"><%= "Attach Receipts" %><abbr class='mandatory'>*</abbr></td> 
+		        	<% if @viewflag==false %>
+			        	<td width="36%" class="tblContent"><%= file_field :billexpense,:filename,:class => 'inputField' %>
+			        <% else %>		
+			  			<td width="36%" class="tblContent"><%= link_to "view receipts",{:controller => "EmployeeTravelExpenses", :action => "view_picture", :id => @billexpenses.id}%></td>
+			    	<% end %>
+			    	<td width="20%" class="tblLabel"><%= "Client Billable" %></td>
+			    	<% if @viewflag==false %>
+			    		<td class="tblContent">
+							<%= radio_button_tag(:radio, value = "0", checked= true, options = {}) %> Yes
+							<%= radio_button_tag(:radio, value = "1", checked= false, options = {}) %> No	
+			    		</td>
+			    	<% else %>
+			    		<td class="tblContent">
+							<%if @billexpenses.clientBillable == false %>
+	           					Yes
+		   					<% else %>
+		   						No
+		   					<% end %>
+		   			<% end %>
+	   			</td>
+	    		</tr>
+    		</table>
+    	</div>
+    	<br/>
+    	<div class="portletSkin" style="height:500px;">
+    		<div class="portletHeader"><%= "Bill / Expense Details" %> </div>
+    		<div style="padding:10px;">
+    		<div style="height:380px;overflow:hidden;overflow-y:auto">
+    			<%= hidden_field :maxLine,:hdnMaxLine,{:value => "0"} %>
+				<%= hidden_field :maxLine,:hiddenarray,{:value => "0"} %>
+    			<table id="dataTable" width="100%" border="0" align="center" cellpadding="4" cellspacing="1" class="tblBorder">
+    			<thead>
+        			<tr class="inputFieldErrCheck">
+        				<td width="1%"><%= "SL NO"%></td>
+			            <td width="7%"><%= "Bill No  "%><abbr class='mandatory'>*</abbr></td>
+			            <td width="7%"><%= "Bill Date "%><abbr class='mandatory'>*</abbr></td>
+			            <td width="7%"><%= "Expense Type "%><abbr class='mandatory'>*</abbr></td>
+			            <td width="7%"><%= "Amount "%><abbr class='mandatory'>*</abbr></td>
+    				</tr>
+    				<% if @viewflag==true %>
+    				<% i=0%>
+    				<% @billexpenses.billexpensedetails.each do |details|%>
+    					<%i=i+1%>
+    				<tr>
+    					<% expencetype= Expensetype.find(details.expenseTypeId) %>
+    					<td width="1%"><%= i%></td>
+			            <td width="7%"><%=text_field_tag "billExpenses_billNo"+i.to_s, details.billNo,:class => 'inputField',:disabled => "true" %></td>
+			            <td width="7%"><%=text_field_tag "billExpenses_billDate"+i.to_s, details.billDate, :class => 'inputField',:disabled => "true" %></td>
+			            <%=hidden_field_tag "select"+i.to_s,details.expenseTypeId %>
+			            <td width="7%"><%=text_field_tag "expenceType", expencetype.name,:class => 'inputField', :disabled => "true" %></td>
+			            <td width="7%"><%=text_field_tag "billExpenses_amount"+i.to_s, details.amount,:class => 'inputField', :disabled => "true" %></td>
+    				</tr>
+    				<% end %>
+    				<% end %>
+    			</thead>
+    		</table><br><br>
+    		
+    		 <div style="float:right">
+	   	 		<div class="buttonBlueLeft" style="margin-left:5px;">
+	     			 <div class="buttonText" onclick="generateReport()"><%= "Generate Report"%></div>
+	     			<div class="buttonBlueRight_M"></div>
+	    		</div>     
+    		</div>
+    		
+       		</div>
+       			<div id="totalRow"><%= "Total (INR):"%>
+       				<% if @viewflag==false %>
+       					<%= text_field :billexpense,:grandTotal, :value=>"0", :class => 'inputField', :disabled => "true" %></div>
+					<% else %>
+						<%=text_field_tag "billexpense_grandTotal", @billexpenses.grandTotal,:class => 'inputField',:disabled => "true" %>
+					<% end %></div>
+			<% if @viewflag==false %>
+				<div style="float:left;margin-top:10px;">
+		 		<div class="buttonBlueLeft" style="margin-left:5px;">
+		     		<div class="buttonText" onclick="addRow()"><%= "Add Row"%></div>
+		        	<div class="buttonBlueRight_M"></div>
+	    		</div>	
+				<div class="buttonBlueLeft" style="margin-left:5px;">
+	    			<div class="buttonText" onclick="removeRow()"><%= "Delete Row" %></div>
+	        		<div class="buttonBlueRight_M"></div>
+	    		</div>	
+	    		<!-- <div class="buttonBlueLeft" style="margin-left:5px;">
+	    			<div class="buttonText" onclick="viewEarlierRecords()"><%= "View Earlier Records"%></div>
+	    			<div class="buttonBlueRight_M"></div>
+	   			</div> -->
+	   			</div>
+	   		<% end %> 
+   		</div>
+ 	 </div>
+   	</div>
+   	&nbsp;
+   	<% if @viewflag==false %>
+	   <div style="float:right">
+	   	 <div class="buttonBlueLeft" style="margin-left:5px;">
+	      <div class="buttonText" onclick="submitForm()"><%= "Submit For Approval"%></div>
+	      <div class="buttonBlueRight_M"></div>
+	    </div>     
+		<div class="buttonBlueLeft" style="margin-left:5px;">
+	      <div class="buttonText" onclick="CancelForm()"><%= "Cancel" %></div>
+	      <div class="buttonBlueRight_M"></div>
+	    </div>
+	   </div>
+	<% else %>
+		<div style="float:right">
+	  		<div class="buttonBlueLeft" style="margin-left:5px;">
+			<div class="buttonText" onclick="Back()" >Back</div>
+			<div class="buttonBlueRight_M"></div>
+			</div>
+  		</div>
+  	<% end %> 	
+ </div>
+	
+	
+<!-- <% end %>  -->
+</form>
+</body>
+</html>
+    
+
+
+
+
+

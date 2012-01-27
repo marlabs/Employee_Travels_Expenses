@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <p>Dear <%= @employee.name%>,
+		Your claim has been approved by your manager (<%=@manager.name%>) 
+	</p>
+	<p>	Claim Details.</p>
+	<p>Claim ID :<%=@billexpense.claimPrefix%><%=@billexpense.id%></p>
+	<p>Claim Amount :<%=@billexpense.grandTotal%></p>
+	<p>
+	Thanks & Regards,
+	Marlabs Training Team
+	</p>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <p>Dear <%=@manager.name%>,
+		Your reportee <%=@employee.name%>(Emp ID= <%=@employee.empid%>) has raised  a claim , the details are mentioned below
+	</p>		
+		<p>Claim No : <%=@billexpense.claimPrefix%><%=@billexpense.id%></p>
+		<p>Claim Amount :<%=@billexpense.grandTotal%></p>
+		<p>Please login to the application and approve/reject the request.</p>
+	<p>
+	Thanks & Regards,
+	Marlabs Finance Team
+	</p>
+  </body>
+</html>

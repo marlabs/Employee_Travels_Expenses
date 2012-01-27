@@ -1,0 +1,135 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+</head>
+<script type="text/javascript">
+function managerApproval()
+	{
+		 if(!validateApprove())
+		 	return false;
+		
+		var frm = document.getElementById('frmMain');
+		frm.action='/managerApproval';
+		frm.submit();		
+	}
+	
+	function managerRejection()
+	{
+		 if(!validateApprove() || !validateReject())
+		 	return false;
+		
+		var frm = document.getElementById('frmMain');
+		frm.action='/managerRejection';
+		frm.submit();		
+	}
+	
+	function Back()
+	{		
+		var frm = document.getElementById('frmMain');
+		frm.action='/travelexpenses';
+		frm.submit();		
+	}
+	
+	function validateReject() {
+		
+		var checkedArray = $("input[name='checkedids[]']").serializeArray();
+		//alert(checkedArray[0].value)
+		var count=0;
+		for(var i=0;i<checkedArray.length;i++)
+		{
+			var j=checkedArray[i].value;
+			if(document.getElementById("textarea"+j).value == "")
+			{
+				alert("Please Enter Remarks before doing reject");
+				document.getElementById("textarea"+j).focus();
+				return false
+				count++;
+				
+			}
+			
+		}
+		if(count==0)
+			return true;
+	}
+	function validateApprove()
+	{
+		var checkedArray = $("input[name='checkedids[]']").serializeArray();
+		//alert(checkedArray[0].value)
+		if(checkedArray.length==0)
+		{
+			alert("Please select records");
+			return false
+		}
+		else
+		return true;
+	}
+</script>
+<body>
+	<% unless flash[:notice].blank? %>
+		<script type="text/javascript">alert('<%= flash[:notice] %>');</script>
+	<% end %>
+	<form name="frmMain" id="frmMain"  method="post" >
+		<div id="admain">
+		<h3> Travel Expenses Form - Manager Review</h3>
+		<div class="portletSkin" style="height:500px;">
+			<div class="portletHeader">Summary of Bill / Expense Details </div>
+			<div style="padding:10px;">
+				<table width="100%" border="0" cellpadding="4" cellspacing="1" class="tblBorder" id="tblGridView">
+					<thead>
+  					<tr>
+  						<td rowspan="2" align="center"><span class="tblHeader"><%= "Select" %></span></td>
+					    <td colspan="3" align="center"><span class="tblHeader"><%= "Claim Details" %></span></td>
+					    <td colspan="2" align="center"><span class="tblHeader"><%= "Employee Details" %></span></td>
+					    <td rowspan="2" align="center"><span class="tblHeader"><%= "Date Submitted" %></span></td>
+					    <td rowspan="2" align="center"><span class="tblHeader"><%= "Remarks" %></span></td>
+					</tr>
+					<tr>
+					    <td align="center"><span class="tblHeader"><%= "Claim ID" %></span></td>
+					    <td align="center"><span class="tblHeader"><%= "Claim Description" %></span></td>
+					    <td align="center"><span class="tblHeader"><%= "Claim Amount" %></span></td>
+					    <td align="center"><span class="tblHeader"><%= "Employee ID" %></span></td>
+					    <td align="center"><span class="tblHeader"><%= "Employee Name" %></span></td>
+					</tr>
+   					</thead>
+					<% @billexpenses.each do |billexp| %>
+					<tr class="tblRow1">
+					    <td align="center">
+					    	<!--input type="checkbox" name="checkbox[]" id="checkbox" value="<%=billexp.id%>"/-->
+					    	<%#= check_box_tag "checkedids[]", billexp.id, checked = false %>
+					    	<%= check_box_tag "checkedids[]",billexp.id %>
+						</td>
+					    <td><a href="travelexpenses/view?idvalue=<%=billexp.id%>"><%= billexp.claimPrefix%><%=billexp.id%></a></td>
+					    <td></td>
+					    <td><%= billexp.grandTotal %></td>
+					    <td><%= billexp.employee.empid %></td>
+					    <td><%= billexp.employee.name %></td>
+					    <td><%= billexp.created_at %></td>
+					    <td><%= text_area_tag "textarea"+billexp.id.to_s, nil, :cols=>20,:rows=>1 %></td>
+			  		</tr>
+			  		<% end %>
+  				</table>
+  				 <div style="float:right">
+				    <div class="buttonBlueLeft" style="margin-left:5px;">
+				      <div class="buttonText" onclick="managerApproval()"><%= "Approve" %></div>
+				      <div class="buttonBlueRight_M"></div>
+				    </div>
+				    <div class="buttonBlueLeft" style="margin-left:5px;">
+				      <div class="buttonText" onclick="managerRejection()" ><%= "Reject" %></div>
+				      <div class="buttonBlueRight_M"></div>
+				    </div>
+				     <div class="buttonBlueLeft" style="margin-left:5px;">
+				      <div class="buttonText" onclick="Back()" ><%= "Back" %></div>
+				      <div class="buttonBlueRight_M"></div>
+				    </div>
+  				</div>
+  			</div>
+  		</div>
+		</div>
+	</form>
+</body>
+</html>
+
+
+			  		
+
+

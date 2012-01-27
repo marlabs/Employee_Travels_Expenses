@@ -1,0 +1,88 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript">
+function getData()
+{
+	//alert(window.opener.document.getElementById("billexpense_travelToDate").value);
+	var tableParent=window.opener.document.getElementById('dataTable');
+	var tableLength=tableParent.rows.length;
+	//alert(tableLength);
+	var table =document.getElementById('dataTable1');
+	var lastRow = table.rows.length;
+	for(var i=1;i<tableLength;i++)
+	{
+		var row = table.insertRow(i);
+		
+		var cell1 = row.insertCell(0);
+		var textNode = document.createTextNode(window.opener.document.getElementById('billExpenses_billDate'+(i)).value);
+	  	cell1.appendChild(textNode);
+		for(var j=0;j<=7;j++)
+		{
+	  		var a=window.opener.document.getElementById("select"+(i)).value
+			if(window.opener.document.getElementById("select"+(i)).value==(j+1))
+			{
+				var cell2 = row.insertCell(a);
+				var textNode = document.createTextNode(window.opener.document.getElementById('billExpenses_amount'+(i)).value);
+  				cell2.appendChild(textNode);
+			}
+			else
+			{
+				 var cell = row.insertCell(j+1);
+				 var textNode = document.createTextNode("");
+  				 cell.appendChild(textNode);
+			 }
+		}
+		var cell9 = row.insertCell(9);
+		var textNode = document.createTextNode(window.opener.document.getElementById('billExpenses_amount'+(i)).value);
+	  	cell9.appendChild(textNode);
+	}
+	var table1 =document.getElementById('dataTable2');
+	var lastRow1 = table1.rows.length;
+	var row1 = table1.insertRow(1);
+	
+	var newCell = row1.insertCell(0);
+	var total=window.opener.document.getElementById("billexpense_grandTotal").value;
+	newCell.setAttribute("align", "center");
+	newCell.id = newCell.uniqueID;
+	newCell.innerHTML = "<h2>Total Amount:"+total+"</h2>";
+
+}
+</script>
+</head>
+<body onload="getData()">
+<h2 align="center">View Report</h2>
+<div class="portletSkin" style="height:500px;">
+  <div style="padding:10px;">
+    <div style="height:380px;overflow:hidden;overflow-y:auto">
+    	<table id="dataTable1" width="100%" border="0" align="center" cellpadding="4" cellspacing="1" class="tblBorder">
+       	<thead>
+        <tr class="inputFieldErrCheck">
+			<% if @viewflag==false %>
+	  		<td width="1%">del</td>
+	  		<% end %>
+	  		<td width="5%"><%= "Date" %></td>
+            <td width="7%"><%= "Local Conveyance" %></td>
+            <td width="7%"><%= "Travel Air/Other" %></td>
+            <td width="7%"><%= "Per Diem" %></td>
+		    <td width="7%"><%= "Lodging (Room & taxes only)" %></td>
+		    <td width="7%"><%= "Meals" %></td>
+		    <td width="7%"><%= "Client Entertainment" %></td>
+		    <td width="7%"><%= "Telephone" %></td>
+		    <td width="7%"><%= "Miscellaneous Expenses" %></td>
+		    <td width="7%"><%= "Total Expenses" %></td>
+		    <!-- <td width="15%"><%= "Total Claimed by Company" %></td> -->
+        </tr>
+    	
+    	</thead>
+       </table>
+       <table id="dataTable2" width="100%">
+       	<tr>
+       		<td width="10%"><h2><%=  %></h2></td>
+       	</tr>
+       </table>
+	</div>
+</div>
+</div>
+</body>
+</html>
